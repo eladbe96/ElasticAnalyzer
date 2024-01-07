@@ -12,8 +12,8 @@ data "archive_file" "init" {
 
 # S3 related resources - policy and role
 
-resource "aws_s3_bucket" "upload_backet" {
-  bucket = "user-upload_packet"
+resource "aws_s3_bucket" "upload-backet-eladbe" {
+  bucket = "user-upload-bucket-eladbe"
 }
 
 
@@ -63,7 +63,8 @@ resource "aws_iam_role" "lambda-s3-trigger_role" {
 # Adding S3 bucket as trigger to my lambda and giving the permissions
 
 resource "aws_s3_bucket_notification" "aws-lambda-trigger" {
-  bucket = aws_s3_bucket.upload_backet.id
+  depends_on = [aws_s3_bucket.upload-backet-eladbe]
+  bucket = aws_s3_bucket.upload-backet-eladbe.id
   lambda_function {
     lambda_function_arn = aws_lambda_function.lambda.arn
     events              = ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"]
@@ -76,7 +77,7 @@ resource "aws_lambda_permission" "invoke_permissions" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda.function_name
   principal     = "s3.amazonaws.com"
-  source_arn    = "arn:aws:s3:::${aws_s3_bucket.bucket.id}"
+  source_arn    = "arn:aws:s3:::${aws_s3_bucket.upload-backet-eladbe.id}"
 }
 
 #Lambda function
