@@ -16,6 +16,7 @@ def lambda_handler(event, context):
     try:
         response = s3.get_object(Bucket=bucket, Key=key)
         print("CONTENT TYPE: " + response['ContentType'])
+        print("Bucket: " + bucket + " File Name:" + key)
         return response['ContentType']
     except Exception as e:
         print(e)
