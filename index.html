@@ -11,9 +11,6 @@
 
  AWS.config.update({
                 region: bucketRegion,
-                credentials: new AWS.CognitoIdentityCredentials({
-                IdentityPoolId: IdentityPoolId
-                })
             });
 
             var s3 = new AWS.S3({
@@ -36,31 +33,30 @@
 
     <script type="text/javascript">
 
-      function s3upload() {  
-                var files = document.getElementById('fileUpload').files;
-                if (files) 
-                {
-                    var file = files[0];
-                    var fileName = file.name;
-                    var filePath = 'my-first-bucket-path/' + fileName;
-                    var fileUrl = 'http://' + bucketName + '.s3-website-' + bucketRegion + '.amazonaws.com' + filePath;
-            
-                    s3.upload({
-                                    Key: filePath,
-                                    Body: file,
-                                    ACL: 'public-read'
-                                }, function(err, data) {
-                                    if(err) {
-                                        reject('error');
-                                    }
-                                    
-                                    alert('Successfully Uploaded!');
-                                }).on('httpUploadProgress', function (progress) {
-                                    var uploaded = parseInt((progress.loaded * 100) / progress.total);
-                                    $("progress").attr('value', uploaded);
-                                });
-                }
-      };
+    function s3upload() {
+            var files = document.getElementById('fileUpload').files;
+            if (files.length > 0) {
+                var file = files[0];
+
+                s3.upload({
+                    Key: file.name, // Upload to the root folder with the same file name
+                    Body: file,
+                    ACL: 'public-read'
+                }, function (err, data) {
+                    if (err) {
+                        console.error(err);
+                        alert('Error uploading file!');
+                    } else {
+                        alert('Successfully Uploaded!');
+                    }
+                }).on('httpUploadProgress', function (progress) {
+                    var uploaded = parseInt((progress.loaded * 100) / progress.total);
+                    $("progress").attr('value', uploaded);
+                });
+            } else {
+                alert('Please select a file to upload.');
+            }
+        };
     </script>
 </body>
 </html>
