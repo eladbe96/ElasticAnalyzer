@@ -89,4 +89,9 @@ resource "aws_lambda_function" "lambda" {
   role    = aws_iam_role.lambda-s3-trigger_role.arn
   handler = "main.lambda_handler"
   runtime = var.runtime
+  environment {
+     variables = {
+        BUCKET_NAME = var.bucket_name
+        BUCKET_REGION = var.aws_region
+     }
   }

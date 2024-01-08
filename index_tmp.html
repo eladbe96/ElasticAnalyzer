@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.1030.0/aws-sdk.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Upload Form</title>
+    <!-- Add your preferred CSS styling or use an external stylesheet -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            max-width: 300px;
+            margin: auto;
+        }
+
+        input {
+            margin-bottom: 10px;
+            padding: 8px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Log Upload Form</h2>
+
+    <form id="uploadForm">
+        <input type="file" id="fileInput" accept=".zip, .tar, .gz" required>
+        <input type="email" id="emailInput" placeholder="Enter your email" required>
+        <button type="button" onclick="uploadFile()">Upload</button>
+    </form>
+    <script>
+    function uploadFile() {
+        // Get the file input and email input elements
+        const fileInput = document.getElementById('fileInput');
+        const emailInput = document.getElementById('emailInput');
+
+        // Validate inputs
+        if (!fileInput.files.length) {
+            alert('Please choose a file to upload.');
+            return;
+        }
+
+        if (!emailInput.value.trim()) {
+            alert('Please enter your email address.');
+            return;
+        }
+        // Get the selected file and email
+        const file = fileInput.files[0];
+        const userEmail = emailInput.value.trim();
+
+        // Set your S3 bucket URL
+        const s3BucketUrl = 'http://user-upload-bucket-eladbe.s3-website-eu-west-1.amazonaws.com';
+
+        // Construct the URL for the file upload
+        const uploadUrl = `${s3BucketUrl}/${s3Key}`;
+
+        // Use the AWS SDK to interact with S3
+        const bucketName = 'user-upload-bucket-eladbe';
+        const s3 = new AWS.S3(); // Initialize AWS S3
+
+        // Set the S3 key (object key) based on your requirements
+        const s3Key = `uploads/${Date.now()}_${file.name}`;
+
+        // Configure the S3 parameters
+        const params = {
+            Bucket: bucketName,
+            Key: s3Key,
+            Body: file,
+            ContentType: file.type,
+            ACL: 'public-read' // Adjust ACL based on your security requirements
+        };
+
+        // Upload the file to S3
+        s3.upload(params, (err, data) => {
+            if (err) {
+                console.error('Error uploading file to S3:', err);
+                alert('Error uploading file. Please try again.');
+            } else {
+                // File uploaded successfully, now you can trigger backend processes (e.g., Lambda) using API calls
+                console.log('File uploaded successfully:', data);
+
+                // You can include additional logic here, such as triggering backend processes and sending an email
+                // For simplicity, we'll just display a success message
+                alert('File uploaded successfully!');
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
